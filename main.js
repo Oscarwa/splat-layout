@@ -12,8 +12,8 @@ const botName = "NazBorg";
 // twitch bot settings
 const config = {
   connection: {
-    cluster: "aws",
-    reconnect: true,
+	reconnect: true,
+	secure: true
   },
   identity: {
     username: botName,
@@ -34,7 +34,6 @@ if (channels.length) {
       const [command] = message.split(" ").filter((i) => i !== "");
       switch (command) {
         case `!${commandName}`:
-          console.log(user);
           const userColor = user.color;
           commandShoot(userColor);
           break;
