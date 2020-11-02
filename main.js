@@ -6,8 +6,8 @@ if (!channel) {
 const channels = channel.split(",") || [];
 const commandName = urlParams.get("command") || "splat";
 const minShoots = +urlParams.get("min") || 2;
-const maxShoots = +urlParams.get("max") || 5;
-const volume = +urlParams.get("vol") || 0.5;
+const maxShoots = +urlParams.get("max") || minShoots + 3;
+const volume = +urlParams.get("vol") || 0.1;
 const botName = "NazBorg";
 
 // twitch bot settings
