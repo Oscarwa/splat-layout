@@ -1,0 +1,17 @@
+body {
+    overflow: hidden;
+}
+#shoots {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+#shoots svg {
+    position: absolute;
+    transition: opacity 2s ease;
+}
+svg.vanish {
+    opacity: 0;
+}
