@@ -12,9 +12,12 @@ Use this as a Web Resource on OBS or your preferred streaming software
 
 Make sure to setup your channel name on URL
 
-```
-http://oscarwa.github.io/splat-layout?channel=`channelName`&command=`command`&min=`min`&max=`max`
-```
+https://oscarwa.github.io/splat-layout?channel=nazgulmx
+
+Or use it with the available options
+
+https://oscarwa.github.io/splat-layout?**channel**=*channelName*&**command**=*command*&**min**=*min*&**max**=*max*
+
 Where:
 * `channelName` ***(required)*** - Can be a single channel (e.g. `channel=nazgulmx`) or a series of channels comma separated (e.g. `channel=nazgulmx,twitch,nintendo`) 
 * `command` ***(optional - default: !splat)*** - The command you want to use on your channel (e.g. `command=!shoot`) this will allow users to use the command on your chat
