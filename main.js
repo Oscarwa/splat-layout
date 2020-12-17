@@ -22,9 +22,9 @@ const config = {
   },
   channels: channels,
 };
-
+let client = null;
 if (channels.length) {
-  const client = new tmi.client(config);
+  client = new tmi.client(config);
   client.connect();
 
   client.on("chat", (channel, user, message, self) => {
@@ -36,7 +36,13 @@ if (channels.length) {
       switch (command) {
         case `!${commandName}`:
           const userColor = user.color;
-          commandShoot(userColor);
+          const userName = user['display-name'];
+          commandShoot(userColor, userName);
+          break;
+        case `!squid`:
+          if(user.badges['broadcaster'] || user.badges['moderator'] || user.badges['vip']) {
+            commandSquid();
+          }
           break;
       }
     }
@@ -44,6 +50,7 @@ if (channels.length) {
 }
 
 const soundsPath = "./sounds";
+const directHitSound = new Howl({ src: [`${soundsPath}/ShotExplosionDirect00.wav`] });
 const shootSounds = [
   new Howl({ src: [`${soundsPath}/MachineGun00.wav`] }),
   new Howl({ src: [`${soundsPath}/MachineGun00.wav`] }),
@@ -53,6 +60,7 @@ const shootSounds = [
   new Howl({ src: [`${soundsPath}/NormalShotGravity00.wav`] }),
   new Howl({ src: [`${soundsPath}/NormalShotLong00.wav`] }),
 ];
+
 const inkColors = [
   "#18D618",
   "#a72de1",
@@ -87,23 +95,46 @@ const shoot = (type) => {
   shootSounds[type].volume(vol);
   shootSounds[type].play();
 };
-const splat = (color) => {
+const hit = () => {
+  const vol = volume;
+  directHitSound.volume(vol);
+  directHitSound.play();
+}
+const splat = (color, userName) => {
   const splatEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   splatEl.setAttributeNS(null, "width", 589);
   splatEl.setAttributeNS(null, "height", 538);
-  splatEl.style = `top: ${Math.random() * 85 + 5}%; left: ${
-    Math.random() * 85 + 5
-  }%; zoom: ${Math.random() * 0.3 + 0.1}`;
+  const shapeNumber = Math.floor(Math.random() * splatShapes.length);
+  const top = Math.random() * 85 + 5;
+  const left = Math.random() * 85 + 5;
+  splatEl.style = `
+    top: ${top}%; 
+    left: ${left}%;
+    zoom: ${Math.random() * 0.2 + 0.1};`;
   const splatPath = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "path"
   );
-  const splatShape =
-    splatShapes[Math.floor(Math.random() * splatShapes.length)];
+  const splatShape = splatShapes[shapeNumber];
   splatPath.setAttributeNS(null, "d", splatShape);
   splatPath.setAttributeNS(null, "fill", color);
   splatEl.appendChild(splatPath);
   document.getElementById("shoots").appendChild(splatEl);
+
+  const width = splatEl.getBBox().width;
+  const height = splatEl.getBBox().height;
+  splatEl.setAttributeNS(null, "width", width);
+  splatEl.setAttributeNS(null, "height", height);
+  
+  if(squidInterval !== null) {
+    if(top + height > pos.y && top < pos.y + pos.h) {
+      if(left + width > pos.x && left < pos.x + pos.w) {
+        hit();
+        killSquid();
+        client.say(channel, `${userName}'s direct hit!`);
+      }
+    }
+  }
   setTimeout(() => {
     splatEl.classList.add("vanish");
   }, 3000);
@@ -111,22 +142,77 @@ const splat = (color) => {
     splatEl.remove();
   }, 5000);
 };
-const shootLoop = (times, type, color) => {
+const shootLoop = (times, type, color, userName) => {
   if (times > 0) {
     const time = 50 + Math.random() * 150;
     setTimeout(() => {
       shoot(type);
-      splat(color);
-      shootLoop(times - 1, type, color);
+      splat(color, userName);
+      shootLoop(times - 1, type, color, userName);
     }, time);
   }
 };
 
-commandShoot = (userColor) => {
+commandShoot = (userColor, userName) => {
   const shoots =
     minShoots + Math.floor(Math.random() * (maxShoots - minShoots));
   const type = Math.floor(Math.random() * shootSounds.length);
   const color =
     userColor || inkColors[Math.floor(Math.random() * inkColors.length)];
-  shootLoop(shoots, type, color);
+  shootLoop(shoots, type, color, userName);
 };
+
+const acceleration = 2;
+let vx = acceleration;
+let vy = acceleration;
+let pos = {x: 0, y: 0, w: 0, h: 0};
+
+let squidInterval = null;
+const squidElement = document.getElementById('squid');
+commandSquid = () => {
+  if(squidInterval === null) {
+    squidElement.classList.remove('hide');
+    pos.h = squidElement.height;
+    pos.w = squidElement.width;
+    squidInterval = setInterval(showSquid, 10);
+  }
+}
+showSquid = () => {
+  // Determine x velocity
+  if(pos.x + pos.w > document.body.clientWidth) {
+    vx = -acceleration;
+  } else if(pos.x < 0) {
+    vx = acceleration;
+  }
+
+  // determine y velocity
+  if(pos.y + pos.h > document.body.clientHeight) {
+    vy = -acceleration;
+  } else if(pos.y < 0) {
+    vy = acceleration;
+  }
+
+  // determine angle
+  let angle = 0
+  if(vx === acceleration && vy === acceleration) {
+    angle = 135;
+  } else if( vx === acceleration && vy === -acceleration) {
+    angle = 45;
+  } else if( vx === -acceleration && vy === acceleration) {
+    angle = 225;
+  } else if( vx === -acceleration && vy === -acceleration) {
+    angle = 315;
+  }
+  pos.x += vx;
+  pos.y += vy;
+  squidElement.style.top = `${pos.y}px`;
+  squidElement.style.left = `${pos.x}px`;
+  squidElement.style.transform = `rotate(${angle}deg)`;
+
+}
+killSquid = () => {
+  clearInterval(squidInterval);
+  squidInterval = null;
+  squidElement.classList.add('hide');
+}
+
