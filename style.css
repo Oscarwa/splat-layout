@@ -15,3 +15,12 @@ body {
 svg.vanish {
     opacity: 0;
 }
+.squid {
+    position: absolute;
+    width: 10%;
+    opacity: 0.5;
+    transition: transform 0.1s ease;
+}
+.hide {
+    display: none;
+}
