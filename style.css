@@ -1,5 +1,12 @@
+@font-face {
+    font-family: ProjectPaintball;
+    src: url("PROJECT_PAINTBALL.OTF") format("opentype");
+}
+
 body {
     overflow: hidden;
+    font-family: 'ProjectPaintball';
+    margin: 0;
 }
 #shoots {
     width: 100vw;
@@ -8,18 +15,33 @@ body {
     margin: 0;
     padding: 0;
 }
-#shoots svg {
+#shoots .splat {
     position: absolute;
     transition: opacity 2s ease;
 }
-svg.vanish {
+.vanish {
     opacity: 0;
+}
+#squid {
+    background-image: url('squids-cropped.png');
+    background-size: 600%;
+    background-repeat: no-repeat;
+    transition: opacity 4s ease;
+    opacity: 0.5;
 }
 .squid {
     position: absolute;
     width: 10%;
-    opacity: 0.5;
+    height: 25%;
     transition: transform 0.1s ease;
+}
+.name {
+    width: 100%;
+    text-align: center;
+    display: block;
+    font-size: 1rem;
+    color: white;
+    text-shadow: 3px -2px 3px black;
 }
 .hide {
     display: none;
