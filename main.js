@@ -33,16 +33,14 @@ if (channels.length) {
     if (message.startsWith("!")) {
       // destructuring the message to get the command and three different parameters in separated variables
       const [command] = message.split(" ").filter((i) => i !== "");
+      const userName = user['display-name'];
+      const userColor = user.color;
       switch (command) {
         case `!${commandName}`:
-          const userColor = user.color;
-          const userName = user['display-name'];
           commandShoot(userColor, userName);
           break;
         case `!squid`:
-          if(user.badges['broadcaster'] || user.badges['moderator'] || user.badges['vip']) {
-            commandSquid();
-          }
+          commandSquid(userName);
           break;
       }
     }
@@ -101,16 +99,14 @@ const hit = () => {
   directHitSound.play();
 }
 const splat = (color, userName) => {
-  const splatEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  splatEl.setAttributeNS(null, "width", 589);
-  splatEl.setAttributeNS(null, "height", 538);
+  const splatEl = document.createElement('div');
+  splatEl.classList.add('splat');
+  const inkEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const shapeNumber = Math.floor(Math.random() * splatShapes.length);
-  const top = Math.random() * 85 + 5;
-  const left = Math.random() * 85 + 5;
+  
   splatEl.style = `
-    top: ${top}%; 
-    left: ${left}%;
-    zoom: ${Math.random() * 0.2 + 0.1};`;
+    top: ${Math.random() * 85 + 5}%; 
+    left: ${Math.random() * 85 + 5}%;`;
   const splatPath = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "path"
@@ -118,29 +114,37 @@ const splat = (color, userName) => {
   const splatShape = splatShapes[shapeNumber];
   splatPath.setAttributeNS(null, "d", splatShape);
   splatPath.setAttributeNS(null, "fill", color);
-  splatEl.appendChild(splatPath);
+  inkEl.appendChild(splatPath);
+  splatEl.append(inkEl);
   document.getElementById("shoots").appendChild(splatEl);
 
-  const width = splatEl.getBBox().width;
-  const height = splatEl.getBBox().height;
-  splatEl.setAttributeNS(null, "width", width);
-  splatEl.setAttributeNS(null, "height", height);
+  const width = inkEl.getBBox().width;
+  const height = inkEl.getBBox().height;
+  inkEl.setAttributeNS(null, "width", width / 3);
+  inkEl.setAttributeNS(null, "height", height / 3);
+  inkEl.setAttributeNS(null, 'viewBox', `0 0 ${width} ${height}`);
+
   
+  let increaseSplatTime = 0;
+  const top = splatEl.offsetTop;
+  const left = splatEl.offsetLeft;
   if(squidInterval !== null) {
-    if(top + height > pos.y && top < pos.y + pos.h) {
-      if(left + width > pos.x && left < pos.x + pos.w) {
-        hit();
-        killSquid();
-        client.say(channel, `${userName}'s direct hit!`);
-      }
-    }
+    if(top + (height / 3) > pos.y + (pos.h / 3) && top < pos.y + (pos.h / 1.5) && left + (width / 3) > pos.x && left < pos.x + (pos.w / 1.5)) {
+      console.log('squid position', pos);
+      console.log('splat position', {top, left, height, width});
+      hit();
+      killSquid(pos);
+      increaseSplatTime = 2000;
+      client.say(channel, `${userName}'s direct hit!`);
+    } 
   }
+
   setTimeout(() => {
     splatEl.classList.add("vanish");
-  }, 3000);
+  }, 3000 + increaseSplatTime);
   setTimeout(() => {
     splatEl.remove();
-  }, 5000);
+  }, 5000 + increaseSplatTime);
 };
 const shootLoop = (times, type, color, userName) => {
   if (times > 0) {
@@ -162,38 +166,67 @@ commandShoot = (userColor, userName) => {
   shootLoop(shoots, type, color, userName);
 };
 
-const acceleration = 2;
+let acceleration = 2;
 let vx = acceleration;
 let vy = acceleration;
-let pos = {x: 0, y: 0, w: 0, h: 0};
+let pos = {x: 0, y: 0, w: 0, h: 0, angle: 135, dead: false};
 
 let squidInterval = null;
 const squidElement = document.getElementById('squid');
-commandSquid = () => {
+commandSquid = (userName) => {
   if(squidInterval === null) {
+    changeSquidColor();
     squidElement.classList.remove('hide');
-    pos.h = squidElement.height;
-    pos.w = squidElement.width;
-    squidInterval = setInterval(showSquid, 10);
+    pos.h = squidElement.clientHeight;
+    pos.w = squidElement.clientWidth;
+    pos.name = userName;
+    pos.dead = false;
+    squidInterval = setInterval(() => showSquid(pos), 10);
   }
 }
-showSquid = () => {
-  // Determine x velocity
-  if(pos.x + pos.w > document.body.clientWidth) {
-    vx = -acceleration;
-  } else if(pos.x < 0) {
-    vx = acceleration;
-  }
 
-  // determine y velocity
-  if(pos.y + pos.h > document.body.clientHeight) {
-    vy = -acceleration;
-  } else if(pos.y < 0) {
-    vy = acceleration;
-  }
+const spriteSize = document.body.clientWidth / 10;
+changeSquidColor = () => {
+  const randomSprite = Math.floor(Math.random() * 6);
+  squidElement.style.backgroundPositionX = `${-randomSprite * spriteSize}px`;
+}
+showSquid = (squid) => {
+  squidElement.getElementsByClassName('name')[0].innerHTML = squid.name;
 
+  if(!squid.dead) {
+    let angle = squid.angle;
+    // Determine x velocity
+    if(squid.x + squid.w > document.body.clientWidth) {
+      vx = -acceleration;
+      angle = determineAngle(vx, vy);
+      determineAngle
+    } else if(squid.x < 0) {
+      vx = acceleration;
+      angle = determineAngle(vx, vy);
+    }
+    
+    // determine y velocity
+    if(squid.y + squid.h > document.body.clientHeight) {
+      vy = -acceleration;
+      angle = determineAngle(vx, vy);
+    } else if(squid.y < 0) {
+      vy = acceleration;
+      angle = determineAngle(vx, vy);
+    }
+
+    
+    squid.x += vx;
+    squid.y += vy;
+    squid.angle = angle;
+    squidElement.style.top = `${squid.y}px`;
+    squidElement.style.left = `${squid.x}px`;
+    squidElement.style.transform = `rotate(${squid.angle}deg)`;
+  }
+}
+
+determineAngle = (vx, vy) => {
   // determine angle
-  let angle = 0
+  let angle = pos.angle;
   if(vx === acceleration && vy === acceleration) {
     angle = 135;
   } else if( vx === acceleration && vy === -acceleration) {
@@ -203,16 +236,15 @@ showSquid = () => {
   } else if( vx === -acceleration && vy === -acceleration) {
     angle = 315;
   }
-  pos.x += vx;
-  pos.y += vy;
-  squidElement.style.top = `${pos.y}px`;
-  squidElement.style.left = `${pos.x}px`;
-  squidElement.style.transform = `rotate(${angle}deg)`;
-
+  return angle;
 }
-killSquid = () => {
-  clearInterval(squidInterval);
-  squidInterval = null;
-  squidElement.classList.add('hide');
+killSquid = (squid) => {
+  squid.dead = true;
+  squidElement.classList.add('vanish');
+  setTimeout(() => {
+    clearInterval(squidInterval);
+    squidInterval = null;
+    squidElement.classList.add('hide');
+  }, 5000);
 }
 
