@@ -13,8 +13,8 @@ const botName = "NazBorg";
 // twitch bot settings
 const config = {
   connection: {
-	reconnect: true,
-	secure: true
+    reconnect: true,
+    secure: true,
   },
   identity: {
     username: botName,
@@ -33,7 +33,7 @@ if (channels.length) {
     if (message.startsWith("!")) {
       // destructuring the message to get the command and three different parameters in separated variables
       const [command] = message.split(" ").filter((i) => i !== "");
-      const userName = user['display-name'];
+      const userName = user["display-name"];
       const userColor = user.color;
       switch (command) {
         case `!${commandName}`:
@@ -48,7 +48,9 @@ if (channels.length) {
 }
 
 const soundsPath = "./sounds";
-const directHitSound = new Howl({ src: [`${soundsPath}/ShotExplosionDirect00.wav`] });
+const directHitSound = new Howl({
+  src: [`${soundsPath}/ShotExplosionDirect00.wav`],
+});
 const shootSounds = [
   new Howl({ src: [`${soundsPath}/MachineGun00.wav`] }),
   new Howl({ src: [`${soundsPath}/MachineGun00.wav`] }),
@@ -59,6 +61,7 @@ const shootSounds = [
   new Howl({ src: [`${soundsPath}/NormalShotLong00.wav`] }),
 ];
 
+const mainCanvas = document.getElementById("shoots");
 const inkColors = [
   "#18D618",
   "#a72de1",
@@ -97,13 +100,13 @@ const hit = () => {
   const vol = volume;
   directHitSound.volume(vol);
   directHitSound.play();
-}
+};
 const splat = (color, userName) => {
-  const splatEl = document.createElement('div');
-  splatEl.classList.add('splat');
+  const splatEl = document.createElement("div");
+  splatEl.classList.add("splat");
   const inkEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const shapeNumber = Math.floor(Math.random() * splatShapes.length);
-  
+
   splatEl.style = `
     top: ${Math.random() * 85 + 5}%; 
     left: ${Math.random() * 85 + 5}%;`;
@@ -116,27 +119,32 @@ const splat = (color, userName) => {
   splatPath.setAttributeNS(null, "fill", color);
   inkEl.appendChild(splatPath);
   splatEl.append(inkEl);
-  document.getElementById("shoots").appendChild(splatEl);
+  mainCanvas.appendChild(splatEl);
 
   const width = inkEl.getBBox().width;
   const height = inkEl.getBBox().height;
   inkEl.setAttributeNS(null, "width", width / 3);
   inkEl.setAttributeNS(null, "height", height / 3);
-  inkEl.setAttributeNS(null, 'viewBox', `0 0 ${width} ${height}`);
+  inkEl.setAttributeNS(null, "viewBox", `0 0 ${width} ${height}`);
 
-  
   let increaseSplatTime = 0;
   const top = splatEl.offsetTop;
   const left = splatEl.offsetLeft;
-  if(squidInterval !== null) {
-    if(top + (height / 3) > pos.y + (pos.h / 3) && top < pos.y + (pos.h / 1.5) && left + (width / 3) > pos.x && left < pos.x + (pos.w / 1.5)) {
-      console.log('squid position', pos);
-      console.log('splat position', {top, left, height, width});
+  for (let squidIndex in squids) {
+    const squid = squids[squidIndex];
+    if (
+      top + height / 3 > squid.y + squid.h / 3 &&
+      top < squid.y + squid.h / 1.5 &&
+      left + width / 3 > squid.x &&
+      left < squid.x + squid.w / 1.5
+    ) {
+      console.log("squid position", squid);
+      console.log("splat position", { top, left, height, width });
       hit();
-      killSquid(pos);
+      killSquid(squid);
       increaseSplatTime = 2000;
       client.say(channel, `${userName}'s direct hit!`);
-    } 
+    }
   }
 
   setTimeout(() => {
@@ -169,82 +177,117 @@ commandShoot = (userColor, userName) => {
 let acceleration = 2;
 let vx = acceleration;
 let vy = acceleration;
-let pos = {x: 0, y: 0, w: 0, h: 0, angle: 135, dead: false};
+const squids = [];
 
-let squidInterval = null;
-const squidElement = document.getElementById('squid');
 commandSquid = (userName) => {
-  if(squidInterval === null) {
-    changeSquidColor();
-    squidElement.classList.remove('hide');
-    pos.h = squidElement.clientHeight;
-    pos.w = squidElement.clientWidth;
-    pos.name = userName;
-    pos.dead = false;
-    squidInterval = setInterval(() => showSquid(pos), 10);
+  if (squids.length < 3) {
+    /**
+     * <div id="squid" class="squid hide">
+            <span class="name">NazgulMX</span>
+        </div>
+     */
+    const squidElement = document.createElement("div");
+    squidElement.classList.add("squid");
+    const squidName = document.createElement("span");
+    squidName.classList.add("name");
+    squidName.innerHTML = userName;
+    squidElement.append(squidName);
+    squidElement.style.backgroundPositionX = getSquidColorOffset();
+    mainCanvas.append(squidElement);
+    
+    const x = Math.floor(Math.random() * document.body.clientWidth);
+    const y = Math.floor(Math.random() * document.body.clientHeight);
+
+    const squid = { x, y, w: 0, h: 0, angle: 135, dead: false };
+    squid.h = squidElement.clientHeight;
+    squid.w = squidElement.clientWidth;
+    squid.vx = acceleration;
+    squid.vy = acceleration;
+    squid.name = userName;
+    squid.dead = false;
+    squid.element = squidElement;
+    //squid.interval = setInterval(() => showSquid(squid), 10);
+    squids.push(squid);
   }
-}
+};
 
 const spriteSize = document.body.clientWidth / 10;
-changeSquidColor = () => {
+getSquidColorOffset = () => {
   const randomSprite = Math.floor(Math.random() * 6);
-  squidElement.style.backgroundPositionX = `${-randomSprite * spriteSize}px`;
-}
-showSquid = (squid) => {
-  squidElement.getElementsByClassName('name')[0].innerHTML = squid.name;
+  return `${-randomSprite * spriteSize}px`;
+};
 
-  if(!squid.dead) {
-    let angle = squid.angle;
-    // Determine x velocity
-    if(squid.x + squid.w > document.body.clientWidth) {
-      vx = -acceleration;
-      angle = determineAngle(vx, vy);
-      determineAngle
-    } else if(squid.x < 0) {
-      vx = acceleration;
-      angle = determineAngle(vx, vy);
-    }
-    
-    // determine y velocity
-    if(squid.y + squid.h > document.body.clientHeight) {
-      vy = -acceleration;
-      angle = determineAngle(vx, vy);
-    } else if(squid.y < 0) {
-      vy = acceleration;
-      angle = determineAngle(vx, vy);
-    }
+showSquids = () => {
+  //squidElement.getElementsByClassName('name')[0].innerHTML = squid.name;
 
-    
-    squid.x += vx;
-    squid.y += vy;
-    squid.angle = angle;
-    squidElement.style.top = `${squid.y}px`;
-    squidElement.style.left = `${squid.x}px`;
-    squidElement.style.transform = `rotate(${squid.angle}deg)`;
+  for (const squidId in squids) {
+    const squid = squids[squidId];
+    if (!squid.dead) {
+      let angle = squid.angle;
+      // Determine x velocity
+      if (squid.x + squid.w > document.body.clientWidth) {
+        squid.vx = -acceleration;
+        angle = determineAngle(squid);
+      } else if (squid.x < 0) {
+        squid.vx = acceleration;
+        angle = determineAngle(squid);
+      }
+
+      // determine y velocity
+      if (squid.y + squid.h > document.body.clientHeight) {
+        squid.vy = -acceleration;
+        angle = determineAngle(squid);
+      } else if (squid.y < 0) {
+        squid.vy = acceleration;
+        angle = determineAngle(squid);
+      }
+
+      squid.x += squid.vx;
+      squid.y += squid.vy;
+      squid.angle = angle;
+      squid.element.style.top = `${squid.y}px`;
+      squid.element.style.left = `${squid.x}px`;
+      squid.element.style.transform = `rotate(${squid.angle}deg)`;
+    }
   }
-}
+};
 
-determineAngle = (vx, vy) => {
+setInterval(() => showSquids(), 10);
+
+determineAngle = (squid) => {
   // determine angle
-  let angle = pos.angle;
-  if(vx === acceleration && vy === acceleration) {
+  let angle = squid.angle;
+  if (squid.vx === acceleration && squid.vy === acceleration) {
     angle = 135;
-  } else if( vx === acceleration && vy === -acceleration) {
+  } else if (squid.vx === acceleration && squid.vy === -acceleration) {
     angle = 45;
-  } else if( vx === -acceleration && vy === acceleration) {
+  } else if (squid.vx === -acceleration && squid.vy === acceleration) {
     angle = 225;
-  } else if( vx === -acceleration && vy === -acceleration) {
+  } else if (squid.vx === -acceleration && squid.vy === -acceleration) {
     angle = 315;
   }
   return angle;
-}
+};
+
 killSquid = (squid) => {
   squid.dead = true;
-  squidElement.classList.add('vanish');
+  squid.element.classList.add("vanish");
   setTimeout(() => {
-    clearInterval(squidInterval);
-    squidInterval = null;
-    squidElement.classList.add('hide');
+    squid.element.remove();
+    let squidIndex = squids.indexOf(squid);
+    console.log('squid index', squidIndex);
+    if(squidIndex >= 0) {
+      squids.splice(squidIndex, 1);
+    }
   }, 5000);
-}
+};
 
+const debug = urlParams.get("debug");
+console.log('Debug:', debug)
+if(debug !== null) {
+  document.body.addEventListener('click', () => commandSquid('testing'));
+  document.body.addEventListener('contextmenu', (e) => { 
+    e.preventDefault(); 
+    commandShoot('#000000', 'testing');
+  });
+}

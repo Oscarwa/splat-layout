@@ -22,24 +22,22 @@ body {
 .vanish {
     opacity: 0;
 }
-#squid {
+.squid {
     background-image: url('squids-cropped.png');
     background-size: 600%;
     background-repeat: no-repeat;
     transition: opacity 4s ease;
     opacity: 0.5;
-}
-.squid {
     position: absolute;
     width: 10%;
-    height: 25%;
+    height: 19%;
     transition: transform 0.1s ease;
 }
 .name {
     width: 100%;
     text-align: center;
     display: block;
-    font-size: 1rem;
+    font-size: 1.6rem;
     color: white;
     text-shadow: 3px -2px 3px black;
 }
