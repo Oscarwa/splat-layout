@@ -42,6 +42,9 @@ if (channels.length) {
         case `!squid`:
           commandSquid(userName);
           break;
+        case `!${commandName}_stats`:
+          commandStats();
+          break;
       }
     }
   });
@@ -91,6 +94,27 @@ const splatShapes = [
   "M152.1,96.1c4.3-3.7,2.4-10.3-2.8-12.2l0,0c-0.5-0.2-1.1-0.4-1.6-0.5c-3.2-0.8-7,0.3-10.5,0.1c-3-0.1-6.3-1.5-5.9-6.6  c0.1-1.8,2.3-4.2,5.5-3.6c6.9,1.2,9.5-1.3,8.9-4.3c-0.6-2.9-3.5-4.4-9-2c-3.2,1.4-6.1-0.1-6.9-1.4c-2.1-3.4-1.7-5.2-0.4-7  c2-2.7,5-3.9,7.2-4c6.1-0.3,8.6-1.1,11.3-5c3.2-4.6,0.4-10.1-4.8-11.3c-4.6-1-8.8,1.3-11.6,4.7c-2.4,3-7.8,9.3-15.4,3.5  c-8.6-6.7,6.1-16.8,8.7-20.9c6.1-9.3-2.9-19.8-13-14.7c-4.7,2.4-5.8,7.5-6.5,12.3c-0.5,3.9,0.5,8.9-3.3,10.9  c-5.7,3-19.1,0.4-19.9-5.7c-0.5-4.7,0.9-7.7,1.8-12.1c1-4.8-0.3-9.7-5.7-11c-4.4-1.1-9,1.5-10.3,5.8c-1.9,6.4,8.6,18.3,2.8,23.3l0,0  l0,0c-0.1,0.1-0.1,0.1-0.2,0.2c0,0-0.1,0-0.1,0.1c-0.1,0.1-0.2,0.1-0.3,0.2H70c-0.1,0.1-0.2,0.1-0.3,0.2h-0.1  c-0.1,0.1-0.2,0.1-0.3,0.2h-0.1c-0.1,0.1-0.3,0.1-0.4,0.2c-2.7,1.1-5.7,1.1-7.2-0.3c-2.5-2.2-3.3-4-3.3-6.3c0-3.3-3.6-4.9-5.6-4.2  c-2.6,0.9-4.7,4.1-1.3,7.6c2.3,2.3,3.8,3.7,3.8,6.5c0,4.9-2.5,5.9-3.9,6.4l0,0c-0.3,0.1-0.5,0.1-0.8,0.2l0,0  c-7.3,1.2-10.4-11.8-14.4-15.8c-5.6-5.4-14.8-3.4-16.9,4.3c-2.7,9.6,6.1,16.7,14.3,17.9c5.1,0.8,7.9,3.6,7.1,7.9  c-0.7,3.8-4.9,6.1-9.3,2.9c-4.5-3.2-9.4-3.2-10.7,0.8c-1.4,4.1,3.3,7.5,8.8,6.6c4.5-0.7,8.3,1.2,7.8,5.7c-0.4,3.5-2.7,5.3-7.4,4.6  c-4.6-0.7-8.8-4-14.4-2.2c-4.4,1.5-6.2,6.1-4.1,10l0,0c1.3,2.7,5.1,6.3,10.7,6.8s10.2-1.7,13,0.6c2.2,1.7,2.9,4.9,1.5,7.2  c-0.4,0.5-0.8,1-1.2,1.3l-0.5,0.4c0,0,0.1,0,0.1-0.1c-3.3,2.6-10.4,2.7-11.7,7.1c-1.3,4.3,2,7.5,4.6,7.9c2,0.2,3.4-0.3,4.5-1.2l0,0  c2.8-2.2,4.4-4,8.1-3.3c4.1,0.7,1.7,5.9,3.8,8.7c3.6,4.7,5.5,1,7.3,6c2.1,5.7,5.7,21.2,3.9,31.1c-0.4,2.4,0.1,7.3,5.4,6.8  c3.7-0.4,5.2-4,4.4-7.9c-1.3-6.5,0-11.2,1.3-14.2c1.1-2.5,3.1-2.8,5.6-1.3c5.5,3.2,5.6,35,5.7,41.8c0.1,6.1-1,17.1,6.7,17.6  c6.2,0.4,7.5-5.8,7.9-13.6c0.5-9.4,0.4-26,2.7-33.4c1.5-5,4.6-6.4,6.7-3.9c2.5,2.9-0.1,8.5,6.2,10.3c4,1.1,7.5-1.7,7.4-10.4  c-0.1-8,0.3-27.2,3.4-27.9c3.7-0.9,1.9,6.4,9,7.2c3.7,0.4,7.7-4,7.2-8.4l0,0c-0.7-7.9-6.4-8.2-5.4-14c0.3-1.8,1.7-3.5,4.8-3.8  c5.1-0.5,3.8-8.2,7.3-9C146.4,95.3,148.8,99,152.1,96.1 M31.4,129.5c-2.4-0.7-4.1,0.7-4.8,2.4c-0.5,1.2-0.6,3.4,1.8,4.5  c2.5,1,4.3-0.4,4.8-1.8C33.9,133.1,33.8,130.2,31.4,129.5 M6.6,62.6c-5.7-2.3-9.4,7.1-3.8,8.9C8.5,73.4,12.5,65,6.6,62.6 M151.6,119  c-3.3-1.3-5.4,4-2.2,5C152.6,125.1,155,120.4,151.6,119 M47,10.6c4.3-1.1,3.4-7.9-1.2-6.9C41.5,4.6,42.8,11.6,47,10.6 M34.8,4.7  C37.6,4,37.1-0.5,34.1,0C31.1,0.6,32,5.4,34.8,4.7 M155.7,68.8c-4.4,5.2,4.8,10.6,7.2,5.2C164.9,69.7,159.1,64.8,155.7,68.8   M31.3,18.5c-2-2.7-0.8-6.2,1.8-8c6.6-4.6,11.9,5.8,5.6,9.9C36.3,22,32.9,20.6,31.3,18.5",
   "M200.7,314.1c2.6,3.2,8.1,0.9,8.3-2.7c0.2-3.5-3.4-6.9-6.7-5.2C200.1,307.3,198.2,310.9,200.7,314.1 M72.9,255.3  c4-1.2,3.9-7.1,0.6-8.7c-3.2-1.5-7.7,0.5-7.3,4.2C66.4,253.3,69,256.4,72.9,255.3 M2.6,129.5c3.3,1.5,6.7-2.5,5.6-5.4  c-1.1-2.9-5.3-4.1-7.2-1.4C-0.4,124.5-0.6,128.1,2.6,129.5 M244,254.5c4-1.2,3.9-7.2,0.6-8.7c-3.2-1.5-7.7,0.5-7.3,4.2  C237.5,252.5,240.1,255.6,244,254.5 M13.9,118.1c-3.7,4.9,1.7,11.9,6.9,10.9c5.2-1,8.7-7.4,5-11.5C23.3,114.8,17.5,113.3,13.9,118.1   M173.1,20.7c5.9-1.8,5.7-10.6,0.9-12.9c-4.7-2.3-11.4,0.7-10.9,6.3C163.5,17.7,167.3,22.4,173.1,20.7 M318.5,211.4  c7.4,0.1,11.5-9.8,8.5-16.2c-3.6-7.6-16.1-6.6-18.8,0.2C304.7,204.1,311.1,211.3,318.5,211.4 M94,272.6c3.8-5.2-1.1-13.2-7.1-14.3  c-7.3-1.3-12.9,8-9.5,13.4C81.8,278.6,90.2,277.8,94,272.6 M299.2,66.4c3.8-5.2-1.1-13.2-7.1-14.3c-7.3-1.3-12.9,8-9.5,13.4  C287,72.4,295.4,71.6,299.2,66.4 M267.1,277.8c9,1,15.3-10.7,12.3-18.8c-3.6-9.8-18.9-10-23.1-1.9  C251.1,267.3,258.1,276.8,267.1,277.8 M296.7,185.2c-5.6,5.6-13.9,3.3-19.6-2.2c-6.1-5.9-16.9-9.5-20.7-3.8  c-2.2,3.3-1.9,12.9,15.1,18.8c6.4,2.2,11.8,8.7,13.2,15.5c0.9,4.3,0.4,8.6-3.2,12.2c-4.6,4.6-13.8,3.4-17.2-1.3  c-6.3-8.7-5.2-15.9-14.5-17c-3.2-0.4-6.3,4.1-5.7,11.8c0.6,8.1-3.4,15.1-10.1,14.2c-7.4-1.1-8.6,21.4-9.3,31.2  c-0.5,7.6-3.7,14.1-13.9,14c-5-0.1-7.6-2.4-11.5-2.2c-7,0.4-9.9,8.8-11.3,15.7c-6.7,32.8-8.3,55.7-6.7,84.5  c0.7,12.7,4.9,26.8-0.9,35.6c-1.2,1.8-4.4,4-7,4.2c-6.7,0.5-11.5-2.1-13.3-8.7c-3-11.5,2.7-24.6,3.7-36.4c2.3-27.9,1.2-60-7-81.3  c-2.8-7.4-10-21.1-15.5-15.4c-7.3,7.6,1.2,45.7-6.5,50.2c-3.5,2-9-0.4-10.4-4.9c-1.2-3.9-0.3-9,0.4-12.9c4.5-28.3-3.9-13.7-7.2-35.2  c-1.2-7.9,0.8-36.5-9-41c-9.2-4.2-3,13.5-12.7,17.5c-5.7,2.4-12.7-1-13.7-7.1s3-11.6,6.8-16.5c6.8-8.9,7.5-16.1,3.8-20.9  c-4.4-5.8-13.8-1.5-16.1,4.4c-2.5,6.7-4.9,13.2-12.1,13.5c-8.4,0.4-12.1-7.2-11.8-13.4c0.3-6.2,4.4-10.6,10-13.4  c5.6-2.8,8.5-2.4,13-6.7c3.3-3.1,7.3-7.4,5.6-13.4c-2-7.2-4.8-10.4-12-10.3c-9.5,0.2-12.7,2.1-20.1,8.1c-7.4,6-12.7,8.1-22.1,6.4  c-10.6-1.9-17-13.1-15.5-19.3c2-8.6,9-13.1,18.8-14.8c8.7-1.5,18.2-0.4,27,0.9c4.8,0.7,12.8,1.2,14.9-7.3c2.1-8.7-4.5-12.1-9.2-11.6  c-4,0.4-12.5,1.7-16-1.4c-4.1-3.6-3.7-13.3,3.4-15.2c5.3-1.4,10.9,0.1,15.6,2.9c4.3,2.6,8.2,4.6,12.1,3c2.8-1.1,5.5-7.9-2.9-13.4  c-6.6-4.3-32.8-6.5-39.9-9.7c-8.9-4-13.1-9.9-13.8-14c-1.6-10,4.7-17.8,13.5-19.3c8.8-1.5,21.6,0.8,28.5,6.6  c6.8,5.8,12.9,13,19,18.9c3.3,3.2,7.8,6,12.2,5.1c6.4-1.2,11.1-6.6,10.7-13.7c-0.3-4.4-2.1-11-6.8-15.4C91.4,54.3,82,49.9,76.9,41.4  c-2.5-4.1-3.7-9-3.2-13.8c0.9-9.1,10.3-15.9,19.4-15.2c9.1,0.7,17,7.6,20.3,16c2.1,5.4,2.7,11.2,4.2,16.8c1.5,5.6,2.3,11.1,7.4,13.9  c5.1,2.7,16.9-0.8,17.2-8.5c0.2-4.8-4.8-8.3-4.5-15.2c0.4-7.8,2.5-11.3,8.9-12c6-0.7,9.2,1.8,11.3,7.2c2.7,7.2-1.9,13.4,2.9,21.3  c4.5,7.3,19.1,9.4,29.8,2.5c8.4-5.4,6.4-17.2,8.2-27c2.2-11.8,7.5-19.2,16-24.5c8.5-5.3,21.7-3.6,25.8,5.5  c4.5,10.2-4.3,20.9-11.1,29.7c-5.2,6.8-14,19.2-10.2,26.8c3.4,6.7,11.2,9.9,16.4,7.2c6.3-3.3,7.6-13.7,14.1-18.2  c5.8-4,14.4-3,17.4,3.3c3,6.4,0.3,14.5-5.3,18.7c-4,3-9.3,3.1-12.3,10.9c-3,7.9,6.8,28.2,17.5,29.5c8.4,1,17.3-3.8,26.4-11.5  c7.3-6.1,19.3-4.7,24.3,2c6.7,8.9,0.5,21-10.1,24.9c-10.6,3.9-22.5-0.4-33.5,2.1c-3.5,0.8-6.7,2.5-9.2,5c-3.4,3.3-7.5,16.1-0.3,23.1  c4.2,4,12.1,4.7,18.2,3.5c5.7-1.1,11.1,0.4,14.4,4.6C300.9,174.4,300.5,181.4,296.7,185.2",
 ];
+const stats = {
+  shoots: 0,
+  squids: 0,
+  // { userName: string, squids: number, shoots: number, kills: number }
+  users: [],
+};
+conversion = (ms) => {
+  let sec = (ms / 1000);
+  let min = (ms / (1000 * 60));
+  let hrs = (ms / (1000 * 60 * 60));
+  if (sec < 60) {
+    return `${sec.toFixed(1)}s`;
+  } else if (min < 60) {
+    sec = sec % 60;
+    return `${min.toFixed(0)}m ${sec.toFixed(0)}s`;
+  } else {
+    sec = sec % 60;
+    min = min % 60;
+    return `${hrs.toFixed(0)}h ${min.toFixed(0)}m ${sec.toFixed(0)}s`;
+  }
+};
 const shoot = (type) => {
   const vol = volume;
   shootSounds[type].volume(vol);
@@ -138,12 +162,26 @@ const splat = (color, userName) => {
       left + width / 3 > squid.x &&
       left < squid.x + squid.w / 1.5
     ) {
-      console.log("squid position", squid);
-      console.log("splat position", { top, left, height, width });
       hit();
       killSquid(squid);
+      const userMatch = stats.users.find((l) => l.userName === userName);
+      if (userMatch) {
+        userMatch.kills++;
+      } else {
+        console.error("this shouldn't happen ever XD");
+      }
       increaseSplatTime = 2000;
-      client.say(channel, `${userName}'s direct hit!`);
+      const currentTimestamp = Date.now();
+      const tsDiff = currentTimestamp - squid.timestamp;
+
+      if (userName === squid.userName) {
+        client.say(channel, `Ouch! ${userName} has splatted themself! [${conversion(tsDiff)}]`);
+      } else {
+        client.say(
+          channel,
+          `Booyah! ${userName} has splatted ${squid.userName}! [${conversion(tsDiff)}]`
+        );
+      }
     }
   }
 
@@ -171,6 +209,17 @@ commandShoot = (userColor, userName) => {
   const type = Math.floor(Math.random() * shootSounds.length);
   const color =
     userColor || inkColors[Math.floor(Math.random() * inkColors.length)];
+
+  // stats
+  stats.shoots = stats.shoots + shoots;
+  const userMatch = stats.users.find((u) => u.userName === userName);
+  if (userMatch) {
+    userMatch.shoots = userMatch.shoots + shoots;
+  } else {
+    const user = { userName, squids: 0, shoots, kills: 0 };
+    stats.users.push(user);
+  }
+
   shootLoop(shoots, type, color, userName);
 };
 
@@ -181,11 +230,6 @@ const squids = [];
 
 commandSquid = (userName) => {
   if (squids.length < 3) {
-    /**
-     * <div id="squid" class="squid hide">
-            <span class="name">NazgulMX</span>
-        </div>
-     */
     const squidElement = document.createElement("div");
     squidElement.classList.add("squid");
     const squidName = document.createElement("span");
@@ -194,21 +238,71 @@ commandSquid = (userName) => {
     squidElement.append(squidName);
     squidElement.style.backgroundPositionX = getSquidColorOffset();
     mainCanvas.append(squidElement);
-    
+
     const x = Math.floor(Math.random() * document.body.clientWidth);
     const y = Math.floor(Math.random() * document.body.clientHeight);
 
-    const squid = { x, y, w: 0, h: 0, angle: 135, dead: false };
-    squid.h = squidElement.clientHeight;
-    squid.w = squidElement.clientWidth;
-    squid.vx = acceleration;
-    squid.vy = acceleration;
-    squid.name = userName;
-    squid.dead = false;
-    squid.element = squidElement;
-    //squid.interval = setInterval(() => showSquid(squid), 10);
+    const squid = {
+      x,
+      y,
+      w: squidElement.clientWidth,
+      h: squidElement.clientHeight,
+      angle: 135,
+      dead: false,
+      vx: acceleration,
+      vy: acceleration,
+      userName,
+      element: squidElement,
+      timestamp: Date.now(),
+    };
     squids.push(squid);
+
+    // Stats
+    stats.squids++;
+    const userMatch = stats.users.find((u) => u.userName === userName);
+    if (userMatch) {
+      userMatch.squids++;
+    } else {
+      const user = { userName, squids: 1, shoots: 0, kills: 0 };
+      stats.users.push(user);
+    }
   }
+};
+
+commandStats = () => {
+  const [moreKills] = stats.users.sort((a, b) => (a.kills > b.kills ? -1 : 1));
+  const [moreShoots] = stats.users.sort((a, b) =>
+    a.shoots > b.shoots ? -1 : 1
+  );
+  const [moreSquids] = stats.users.sort((a, b) =>
+    a.squids > b.squids ? -1 : 1
+  );
+  const message = [
+    `Total shoots: ${stats.shoots.toLocaleString()}`,
+    `Total squids: ${stats.squids.toLocaleString()}`,
+  ];
+  if (moreKills && moreKills.kills > 0) {
+    message.push(
+      `Most kills by: ${
+        moreKills.userName
+      } [${moreKills.kills.toLocaleString()}]`
+    );
+  }
+  if (moreSquids && moreSquids.squids > 0) {
+    message.push(
+      `Most squids by: ${
+        moreSquids.userName
+      } [${moreSquids.squids.toLocaleString()}]`
+    );
+  }
+  if (moreShoots && moreShoots.shoots > 0) {
+    message.push(
+      `Most shoots by: ${
+        moreShoots.userName
+      } [${moreShoots.shoots.toLocaleString()}]`
+    );
+  }
+  client.say(channel, `[Splat stats] ${message.join(" | ")}`);
 };
 
 const spriteSize = document.body.clientWidth / 10;
@@ -218,8 +312,6 @@ getSquidColorOffset = () => {
 };
 
 showSquids = () => {
-  //squidElement.getElementsByClassName('name')[0].innerHTML = squid.name;
-
   for (const squidId in squids) {
     const squid = squids[squidId];
     if (!squid.dead) {
@@ -275,19 +367,18 @@ killSquid = (squid) => {
   setTimeout(() => {
     squid.element.remove();
     let squidIndex = squids.indexOf(squid);
-    console.log('squid index', squidIndex);
-    if(squidIndex >= 0) {
+    if (squidIndex >= 0) {
       squids.splice(squidIndex, 1);
     }
   }, 5000);
 };
 
 const debug = urlParams.get("debug");
-console.log('Debug:', debug)
-if(debug !== null) {
-  document.body.addEventListener('click', () => commandSquid('testing'));
-  document.body.addEventListener('contextmenu', (e) => { 
-    e.preventDefault(); 
-    commandShoot('#000000', 'testing');
+console.log("Debug:", debug !== null);
+if (debug !== null) {
+  document.body.addEventListener("click", () => commandSquid("testing"));
+  document.body.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    commandShoot("#000000", "testing");
   });
 }

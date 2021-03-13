@@ -5,6 +5,8 @@ Streaming layout for splat shoots
 ## Changelog
 
 * 2020-11-01 - launch beta version
+* 2021-03-09 - Added multisquid support
+* 2021-03-12 - Added statistics command
 
 ## Usage
 
