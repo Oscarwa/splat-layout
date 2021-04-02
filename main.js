@@ -5,6 +5,8 @@ if (!channel) {
 }
 const channels = channel.split(",") || [];
 const commandName = urlParams.get("command") || "splat";
+const maxSquids = +urlParams.get("max_squids") || 3;
+const cooldown = +urlParams.get("cooldown") || 1;
 const minShoots = +urlParams.get("min") || 5;
 const maxShoots = +urlParams.get("max") || minShoots + 3;
 const volume = +urlParams.get("vol") || 0.2;
@@ -204,21 +206,21 @@ const shootLoop = (times, type, color, userName) => {
 };
 
 commandShoot = (userColor, userName) => {
-  const shoots =
-    minShoots + Math.floor(Math.random() * (maxShoots - minShoots));
-  const type = Math.floor(Math.random() * shootSounds.length);
-  const color =
-    userColor || inkColors[Math.floor(Math.random() * inkColors.length)];
-
-  // stats
+  const timestamp = Date.now();
+  const shoots = minShoots + Math.floor(Math.random() * (maxShoots - minShoots));
   stats.shoots = stats.shoots + shoots;
   const userMatch = stats.users.find((u) => u.userName === userName);
   if (userMatch) {
+    if (timestamp - userMatch.timestamp < (cooldown * 1000)) return;
     userMatch.shoots = userMatch.shoots + shoots;
+    userMatch.timestamp = timestamp;
   } else {
-    const user = { userName, squids: 0, shoots, kills: 0 };
+    const user = { userName, squids: 0, shoots, kills: 0, timestamp };
     stats.users.push(user);
   }
+
+  const type = Math.floor(Math.random() * shootSounds.length);
+  const color = userColor || inkColors[Math.floor(Math.random() * inkColors.length)];
 
   shootLoop(shoots, type, color, userName);
 };
@@ -229,7 +231,7 @@ let vy = acceleration;
 const squids = [];
 
 commandSquid = (userName) => {
-  if (squids.length < 3) {
+  if (squids.length < maxSquids) {
     const squidElement = document.createElement("div");
     squidElement.classList.add("squid");
     const squidName = document.createElement("span");
@@ -283,7 +285,7 @@ commandStats = () => {
   ];
   if (moreKills && moreKills.kills > 0) {
     message.push(
-      `Most kills by: ${
+      `Most splatted by: ${
         moreKills.userName
       } [${moreKills.kills.toLocaleString()}]`
     );
