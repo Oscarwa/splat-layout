@@ -19,9 +19,9 @@ https://oscarwa.github.io/splat-layout?channel=nazgulmx
 
 That will give your chat the following commands:
 
-`!splat` - User will trigger an animation and sound of several (5 to 8) splats on screen, if the user has a color set up for his name, splat shoots will appear that color.
-`!squid` - User will spawn a squid (random color) on screen swimming around, user name will appear in squid face.
-`!splat_stats` - Bot will show all the statistics for the session in the following format: 
+`!splat` - User will trigger an animation and sound of several (5 to 8) splats on screen, if the user has a color set up for his name, splat shoots will appear that color.  
+`!squid` - User will spawn a squid (random color) on screen swimming around, user name will appear in squid face.  
+`!splat_stats` - Bot will show all the statistics for the session in the following format:  
 `[Splat stats] Total shoots: 17 | Total squids: 5 | Most splatted by: NazgulMX [1] | Most squids by: NazgulMX [5] | Most shoots by: NazgulMX [12]`
 
 

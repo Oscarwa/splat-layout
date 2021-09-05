@@ -4,7 +4,7 @@ if (!channel) {
   document.getElementById("shoots").innerHTML = "<h1>No channel provided</h1>";
 }
 const channels = channel.split(",") || [];
-const commandName = urlParams.get("command") || "splat";
+const commandName = urlParams.get("command").toLowerCase() || "splat";
 const maxSquids = +urlParams.get("max_squids") || 3;
 const cooldown = +urlParams.get("cooldown") || 1;
 const minShoots = +urlParams.get("min") || 5;
@@ -25,6 +25,7 @@ const config = {
   channels: channels,
 };
 let client = null;
+let bday = false;
 if (channels.length) {
   client = new tmi.client(config);
   client.connect();
@@ -37,16 +38,36 @@ if (channels.length) {
       const [command] = message.split(" ").filter((i) => i !== "");
       const userName = user["display-name"];
       const userColor = user.color;
-      switch (command) {
+      switch (command.toLowerCase()) {
         case `!${commandName}`:
           commandShoot(userColor, userName);
           break;
+        case `!bday_${commandName}`:
+          if(bday) {
+            if(user.username === 'nazgulmx') {
+              commandHBD();
+            } else {
+              commandSplatHBD();
+            }
+          }
+          break;
         case `!squid`:
-          commandSquid(userName);
+          commandSquid(userName, Math.random() <= 0.02);
           break;
         case `!${commandName}_stats`:
           commandStats();
           break;
+        case `!squld`:
+          if(user.username === 'nazgulmx') {
+            commandSquid(userName, true);
+          } else {
+            commandSquid(userName, Math.random() <= 0.02);
+          }
+          break
+        case `!bday`:
+          if(user.username === 'nazgulmx') {
+            bday = !bday;
+          }
       }
     }
   });
@@ -129,7 +150,7 @@ const hit = () => {
 };
 const splat = (color, userName) => {
   const splatEl = document.createElement("div");
-  splatEl.classList.add("splat");
+  splatEl.classList.add('splat');
   const inkEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const shapeNumber = Math.floor(Math.random() * splatShapes.length);
 
@@ -158,35 +179,35 @@ const splat = (color, userName) => {
   const left = splatEl.offsetLeft;
   for (let squidIndex in squids) {
     const squid = squids[squidIndex];
+    if(squid.shiny) continue;
+
     if (
       top + height / 3 > squid.y + squid.h / 3 &&
       top < squid.y + squid.h / 1.5 &&
       left + width / 3 > squid.x &&
       left < squid.x + squid.w / 1.5
-    ) {
-      hit();
-      killSquid(squid);
-      const userMatch = stats.users.find((l) => l.userName === userName);
-      if (userMatch) {
-        userMatch.kills++;
-      } else {
-        console.error("this shouldn't happen ever XD");
-      }
+    ) {    
       increaseSplatTime = 2000;
       const currentTimestamp = Date.now();
       const tsDiff = currentTimestamp - squid.timestamp;
 
+      const user = stats.users.find((u) => u.userName === userName);
+      if(user) {
+        if(!user.duration || (user.duration && tsDiff > user.duration)) {
+          user.duration = tsDiff;
+        }
+      }
+      killSquid(squid, userName);
       if (userName === squid.userName) {
-        client.say(channel, `Ouch! ${userName} has splatted themself! [${conversion(tsDiff)}]`);
+        client.say(channel, `Ouch! ${userName} has splatted themself! [${conversion(tsDiff)}] NotLikeThis`);
       } else {
         client.say(
           channel,
-          `Booyah! ${userName} has splatted ${squid.userName}! [${conversion(tsDiff)}]`
+          `Booyah! ${userName} has splatted ${squid.userName}! [${conversion(tsDiff)}] PogChamp`
         );
       }
     }
   }
-
   setTimeout(() => {
     splatEl.classList.add("vanish");
   }, 3000 + increaseSplatTime);
@@ -194,6 +215,118 @@ const splat = (color, userName) => {
     splatEl.remove();
   }, 5000 + increaseSplatTime);
 };
+
+let hbdMessage = `********************HappyBirthdayChim3ric!#`;
+const indexOfH = hbdMessage.indexOf('H') - 1;
+const indexOfB = hbdMessage.indexOf('B') - 1;
+const indexOfC = hbdMessage.indexOf('C') - 1;
+const indexOfSharp = hbdMessage.indexOf('#') - 1;
+hbdMessage = hbdMessage.replace('Birthday', 'Birthday'.split('').reverse().join(''));
+
+const splatHBD = (color, times, letter, special) => {
+  const splatEl = document.createElement("div");
+  splatEl.classList.add('splat');
+  let contentEl = null;
+  if (letter === '*' || letter === '#') {
+    contentEl = document.createElement('img');
+    contentEl.src = './chim3rParty.png';
+    contentEl.classList.add('hbd-img');
+    if (letter === '#') {
+      contentEl.classList.add('hbd-img-big');
+    }
+  } else {
+    contentEl = document.createElement('span');
+    contentEl.innerText = letter;
+    contentEl.classList.add('hbd');
+  }
+  const inkEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const hbdShapes = [1, 2, 6, 10, 13, 14];
+  let shapeNumber = hbdShapes[Math.floor(Math.random() * hbdShapes.length)];
+  // 1, 2, 4, 6, 10, 13, 14, 15
+  // 5, 7, 8, 9, 12, 16,
+  let big = 0;
+  const index = hbdMessage.length - times;
+  if (special) {
+    if (index > indexOfC) {
+      // CHIMERIC
+      splatEl.style = `
+        top: ${50 + Math.random() * 3}%; 
+        left: ${-20 + ((index - indexOfC) * 10)}%;`;
+      big = 1;
+      shapeNumber = 4;
+      contentEl.classList.add('big');
+    } else if(index > indexOfB) {
+      // BIRTHDAY
+      splatEl.style = `
+        top: ${20 + Math.random() * 10}%; 
+        left: ${75 - ((index - indexOfB) * 8)}%;`;
+
+        shapeNumber = 13;
+    } else if (index > indexOfH) {
+      // HAPPY
+      splatEl.style = `
+        top: ${5 + Math.random() * 5}%; 
+        left: ${15 + ((index - indexOfH) * 8)}%;`;
+        shapeNumber = 1;
+    } else {
+      // EMOJIS
+      splatEl.style = `
+        top: ${-5 + (Math.random() * 80)}%; 
+        left: ${-10 + (Math.random() * 85)}%;`;
+      big = 1;
+      shapeNumber = 4;
+    }
+    if (letter === '#') {
+      splatEl.style = `
+        top: ${10}%; 
+        left: ${-5}%;`;
+      big = 2;
+      shapeNumber = 4;
+    }
+  } else {
+    // EMOJI
+    splatEl.style = `
+      top: ${-5 + (Math.random() * 80)}%; 
+      left: ${-10 + (Math.random() * 85)}%;`;
+    big = 1;
+    shapeNumber = 4;
+  }
+
+  splatEl.appendChild(contentEl);
+
+  const splatPath = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "path"
+  );
+  const splatShape = splatShapes[shapeNumber];
+  splatPath.setAttributeNS(null, "d", splatShape);
+  splatPath.setAttributeNS(null, "fill", color);
+  inkEl.appendChild(splatPath);
+  splatEl.append(inkEl);
+  mainCanvas.appendChild(splatEl);
+
+  const width = inkEl.getBBox().width;
+  const height = inkEl.getBBox().height;
+  inkEl.setAttributeNS(null, "width", width / 1.8);
+  inkEl.setAttributeNS(null, "height", height / 1.8);
+  if(shapeNumber === 6) {
+    inkEl.setAttributeNS(null, "width", width);
+    inkEl.setAttributeNS(null, "height", height);
+  }
+  if(big) {
+    inkEl.setAttributeNS(null, "width", width * 1.3 * big);
+    inkEl.setAttributeNS(null, "height", height * 1.3 * big);
+  }
+  inkEl.setAttributeNS(null, "viewBox", `0 0 ${width} ${height}`);
+
+  setTimeout(() => {
+    splatEl.classList.add("vanish");
+  }, 12000);
+  setTimeout(() => {
+    splatEl.remove();
+  }, 15000);
+};
+
 const shootLoop = (times, type, color, userName) => {
   if (times > 0) {
     const time = 50 + Math.random() * 150;
@@ -201,6 +334,57 @@ const shootLoop = (times, type, color, userName) => {
       shoot(type);
       splat(color, userName);
       shootLoop(times - 1, type, color, userName);
+    }, time);
+  }
+};
+const shootLoopHBD = (times, type, color, special) => {
+  const index = hbdMessage.length - times;
+  if (times > 0) {
+    let timeSalt = 50;
+    let fixedTime = 100;
+    if(special) {
+      if (index <= indexOfH) {
+        // EMOJI
+        color = inkColors[Math.floor(Math.random() * inkColors.length)];
+        fixedTime = 500;
+        timeSalt = 250;
+      } else if(index <= indexOfB) {
+        // HAPPY
+        color = inkColors[0]; // green
+        timeSalt = 100;
+        fixedTime = 150;
+        type = 1;
+      } else if(index <= indexOfC) {
+        // BIRTHDAY
+        timeSalt = 50;
+        fixedTime = 50;
+        type = 4;
+      } else if (index <= indexOfSharp) {
+        // CHIMERIC
+        timeSalt = 500;
+        fixedTime = 200;
+        color = inkColors[Math.floor(Math.random() * inkColors.length)];
+        type = 6;
+      } else {
+        // BIG EMOJI
+        fixedTime = 3000;
+        color = '#078607' || inkColors[0]; // green
+      }
+    }
+    
+    const time = fixedTime + Math.random() * timeSalt;
+    setTimeout(() => {
+      if(index <= indexOfH || index === hbdMessage.length - 1 && special) {
+        hit();
+      } else {
+        shoot(type);
+      }
+      if(special){
+        splatHBD(color, times, hbdMessage[index], special);
+      } else {
+        splatHBD(color, times, '*', special);
+      }
+      shootLoopHBD(times - 1, type, color, special);
     }, time);
   }
 };
@@ -225,12 +409,21 @@ commandShoot = (userColor, userName) => {
   shootLoop(shoots, type, color, userName);
 };
 
+commandHBD = () => {
+  shootLoopHBD(hbdMessage.length, 0, inkColors[0], true);
+}
+
+commandSplatHBD = () => {
+  const type = Math.floor(Math.random() * shootSounds.length);
+  shootLoopHBD(1, type, inkColors[0], false);
+}
+
 let acceleration = 2;
 let vx = acceleration;
 let vy = acceleration;
 const squids = [];
 
-commandSquid = (userName) => {
+commandSquid = (userName, shiny) => {
   if (squids.length < maxSquids) {
     const squidElement = document.createElement("div");
     squidElement.classList.add("squid");
@@ -256,7 +449,15 @@ commandSquid = (userName) => {
       userName,
       element: squidElement,
       timestamp: Date.now(),
+      shiny: shiny,
     };
+    if(squid.shiny) {
+      // shiny squid!
+      setInterval(() => {
+        squid.element.style.backgroundPositionX = getSquidColorOffset();
+      }, 300);
+      client.say(channel, `${userName} summoned a shiny squid! OhMyDog OhMyDog OhMyDog`);
+    }
     squids.push(squid);
 
     // Stats
@@ -279,6 +480,9 @@ commandStats = () => {
   const [moreSquids] = stats.users.sort((a, b) =>
     a.squids > b.squids ? -1 : 1
   );
+  const [longestTime] = stats.users.sort((a, b) => {
+    a.duration > b.duration ? -1 : 1;
+  });
   const message = [
     `Total shoots: ${stats.shoots.toLocaleString()}`,
     `Total squids: ${stats.squids.toLocaleString()}`,
@@ -296,6 +500,9 @@ commandStats = () => {
         moreSquids.userName
       } [${moreSquids.squids.toLocaleString()}]`
     );
+  }
+  if(longestTime && longestTime.duration > 0) {
+    message.push(`Longest squid by: ${longestTime.userName} [${conversion(longestTime.duration)}]`)
   }
   if (moreShoots && moreShoots.shoots > 0) {
     message.push(
@@ -363,16 +570,29 @@ determineAngle = (squid) => {
   return angle;
 };
 
-killSquid = (squid) => {
-  squid.dead = true;
-  squid.element.classList.add("vanish");
-  setTimeout(() => {
-    squid.element.remove();
-    let squidIndex = squids.indexOf(squid);
-    if (squidIndex >= 0) {
-      squids.splice(squidIndex, 1);
+killSquid = (squid, userName) => {
+  if(!squid.dead) {
+    // play sound
+    hit();
+
+    // update stats
+    const userMatch = stats.users.find((l) => l.userName === userName);
+    if (userMatch) {
+      userMatch.kills++;
+    } else {
+      console.error("this shouldn't happen ever XD");
     }
-  }, 5000);
+
+    squid.dead = true;
+    squid.element.classList.add("vanish");
+    setTimeout(() => {
+      squid.element.remove();
+      let squidIndex = squids.indexOf(squid);
+      if (squidIndex >= 0) {
+        squids.splice(squidIndex, 1);
+      }
+    }, 5000);
+  }
 };
 
 const debug = urlParams.get("debug");
@@ -381,6 +601,7 @@ if (debug !== null) {
   document.body.addEventListener("click", () => commandSquid("testing"));
   document.body.addEventListener("contextmenu", (e) => {
     e.preventDefault();
-    commandShoot("#000000", "testing");
+    //commandShoot("#000000", "testing");
+    commandHBD();
   });
 }

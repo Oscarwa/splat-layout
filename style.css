@@ -18,6 +18,29 @@ body {
 #shoots .splat {
     position: absolute;
     transition: opacity 2s ease;
+    display: flex;
+    align-items: center;
+}
+.hbd {
+    position: relative;
+    left: 50%;
+    top: 35%;
+    font-size: 8vh;
+    color: white;
+    text-shadow: 5px 5px black;
+    z-index: 1;
+}
+.hbd.big {
+    font-size: 15vh;
+}
+.hbd-img {
+    position: relative;
+    left: 53%;
+    zoom: 1.5
+}
+.hbd-img-big {
+    zoom: 4;
+    z-index: 2;
 }
 .vanish {
     opacity: 0;
