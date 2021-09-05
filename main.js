@@ -4,13 +4,15 @@ if (!channel) {
   document.getElementById("shoots").innerHTML = "<h1>No channel provided</h1>";
 }
 const channels = channel.split(",") || [];
-const commandName = urlParams.get("command").toLowerCase() || "splat";
+let commandName = urlParams.get("command") || "splat";
 const maxSquids = +urlParams.get("max_squids") || 3;
 const cooldown = +urlParams.get("cooldown") || 1;
 const minShoots = +urlParams.get("min") || 5;
 const maxShoots = +urlParams.get("max") || minShoots + 3;
 const volume = +urlParams.get("vol") || 0.2;
 const botName = "NazBorg";
+
+commandName = commandName.toLowerCase();
 
 // twitch bot settings
 const config = {
