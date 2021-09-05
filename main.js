@@ -420,7 +420,7 @@ commandSplatHBD = () => {
   shootLoopHBD(1, type, inkColors[0], false);
 }
 
-let acceleration = 2;
+let acceleration = 3;
 let vx = acceleration;
 let vy = acceleration;
 const squids = [];
@@ -455,9 +455,6 @@ commandSquid = (userName, shiny) => {
     };
     if(squid.shiny) {
       // shiny squid!
-      setInterval(() => {
-        squid.element.style.backgroundPositionX = getSquidColorOffset();
-      }, 300);
       client.say(channel, `${userName} summoned a shiny squid! OhMyDog OhMyDog OhMyDog`);
     }
     squids.push(squid);
@@ -551,11 +548,20 @@ showSquids = () => {
       squid.element.style.top = `${squid.y}px`;
       squid.element.style.left = `${squid.x}px`;
       squid.element.style.transform = `rotate(${squid.angle}deg)`;
+
+      if(squid.shiny) {
+        if(squid.shinyCount === 10) {
+          squid.element.style.backgroundPositionX = getSquidColorOffset();
+          squid.shinyCount = 0;
+        }
+        squid.shinyCount = squid.shinyCount + 1 || 0;
+      }
     }
   }
+  requestAnimationFrame(showSquids);
 };
 
-setInterval(() => showSquids(), 10);
+requestAnimationFrame(showSquids);
 
 determineAngle = (squid) => {
   // determine angle
