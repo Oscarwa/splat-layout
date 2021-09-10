@@ -27,7 +27,6 @@ const config = {
   channels: channels,
 };
 let client = null;
-let bday = false;
 if (channels.length) {
   client = new tmi.client(config);
   client.connect();
@@ -45,13 +44,11 @@ if (channels.length) {
           commandShoot(userColor, userName);
           break;
         case `!bday_${commandName}`:
-          if(bday) {
-            if(user.username === 'nazgulmx') {
+            if(user.username === 'nazgulmx' || user.username === 'chim3ric') {
               commandHBD();
             } else {
               commandSplatHBD();
             }
-          }
           break;
         case `!squid`:
           commandSquid(userName, Math.random() <= 0.02);
@@ -65,11 +62,7 @@ if (channels.length) {
           } else {
             commandSquid(userName, Math.random() <= 0.02);
           }
-          break
-        case `!bday`:
-          if(user.username === 'nazgulmx') {
-            bday = !bday;
-          }
+          break;
       }
     }
   });
